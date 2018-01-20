@@ -45,6 +45,7 @@ An interactive fiction by Jack">
 >
  
 <SYNTAX LONG OBJECT = V-LONG>
+<SYNTAX LONG = V-LONG>
 <SYNTAX PRES OBJECT = V-PRES>
 <SYNTAX MID OBJECT = V-MID>
 
@@ -67,16 +68,19 @@ An interactive fiction by Jack">
 	<TELL "." CR>
 >
 
-<ROUTINE LEN (ITEM  "OPT" PRPTY "AUX" MAX )
-	<DIROUT 3 ,TEMPTABLE>
-	<COND 	(<F? .PRPTY> ;"was the optional argument, a property, supplied?"
-				<PRINTD .ITEM>
+<ROUTINE LEN ("OPT" OBJ  PRPTY "AUX" MAX ) ;"if object supplied, operates on whatever remains in temptable buffer"
+	<COND 	(<T? .OBJ>
+				<DIROUT 3 ,TEMPTABLE>
+				<COND 	(<F? .PRPTY> ;"was the optional argument, a property, supplied?"
+							<PRINTD .OBJ>
+						)
+						(<GETP .OBJ .PRPTY> ;"only try to print it if it's not null, i.e., is defined."
+							<TELL <GETP .OBJ .PRPTY>>
+						)
+				>	
+				<DIROUT -3>
 			)
-			(<GETP .ITEM .PRPTY> ;"only try to print it if it's not null, i.e., is defined."
-				<TELL <GETP .ITEM .PRPTY>>
-			)
-	>	
-	<DIROUT -3>
+	>
 	<SET .MAX <GET ,TEMPTABLE 0>>
 	<RETURN .MAX>
 >
@@ -84,7 +88,7 @@ An interactive fiction by Jack">
 ; "print the string starting at element START for NUM characters (or up to end, if shorter)"
 <ROUTINE MID (ITEM START NUM "OPT" PRPTY "AUX" MAX C)
 	<COND 	(<=? .NUM 0> ; "zero length yields nothing, blow this clam bake."
-				<RETURN>
+				<RFALSE>
 			)			
 			(<F? .PRPTY> ;"was the optional argument, a property, supplied?"
 				<SET .MAX <LEN .ITEM>>
@@ -92,13 +96,13 @@ An interactive fiction by Jack">
 			(T
 				<SET .MAX <LEN .ITEM .PRPTY>>
 			)
-	>;"incidentally, loads the TEMPTABLE with the string of interest"
+	>;"incidentally, getting the length loads the TEMPTABLE with the string of interest"
 	<COND	(<L? .START 1>
 				<SET .START 1>
 			)
 	>
 	<COND 	(<=? .MAX 0>
-				<RETURN> ;"as would be the case if, for example, a property were supplied, but the
+				<RFALSE> ;"as would be the case if, for example, a property were supplied, but the
 						   object's property is either <> or the object doesn't have that property"
 			)
 			(<L? <+ .START .NUM -1> .MAX>
@@ -106,8 +110,11 @@ An interactive fiction by Jack">
 			)
 	>
 	<INC .MAX>
-	<DO (I <+ .START 1> .MAX)
+	<INC .START>
+	<DO (I .START .MAX)
 		<SET C <GETB ,TEMPTABLE .I>>
 		<PRINTC .C>
 	>		
 >
+
+
