@@ -70,7 +70,7 @@ An interactive fiction by Jack">
 	<TELL "The length of the presidential name, if any, associated with " D ,PRSO " is: " N <LEN ,PRSO ,P?PRESIDENT> CR> 
 >
 
-<ROUTINE V-MIDBUF ()
+<ROUTINE V-MIDBUF () ;"demo midstring on the buffer itself"
 	<DO (I 7 2 -1)
 		<TELL "Outer 2 and inner " N .I ": " >
 		<MID 2 .I>
@@ -79,7 +79,7 @@ An interactive fiction by Jack">
 	>
 >
 
-<ROUTINE V-MID ()
+<ROUTINE V-MID () ;"demo midstring function on an object's name"
 	<DO (O 0 7)
 		<DO (I 0 7)
 			<TELL "Outer " N .O " and inner " N .I ": " >
@@ -90,12 +90,12 @@ An interactive fiction by Jack">
 	>
 >
 
-<ROUTINE V-SHOW ()
+<ROUTINE V-SHOW () ;"show what's in the scratch buffer"
 	<SHOWSTRING>
 	<CRLF>
 >
 
-<ROUTINE V-SHOWOTHER ()
+<ROUTINE V-SHOWOTHER () ;"just of diagnostic interest"
 	<SHOWSTRING ,OTHERTABLE>
 	<CRLF>
 >
@@ -112,14 +112,16 @@ An interactive fiction by Jack">
 >
 
 <ROUTINE V-REV ()
-	<TELL "Reverse is: ">
 	<REVERSE ,PRSO>
-	<TELL "." CR>
+	<SHOWSTRING>
+	<CRLF>
 >
 
 <ROUTINE V-PRESREV ()
 	<TELL "The reverse of the president (if any) of " D ,PRSO " is: ">
 	<REVERSE ,PRSO ,P?PRESIDENT>
+	<SHOWSTRING>
+	<CRLF>
 >
 
 <ROUTINE LEN ("OPT" OBJ PRPTY "AUX" MAX ) ;"if object supplied, operates on whatever remains in temptable buffer"
@@ -182,12 +184,13 @@ An interactive fiction by Jack">
 		<PUTB ,OTHERTABLE .J .C>
 		<INC .J>
 	>
-	<COPY-TABLE-B ,OTHERTABLE ,TEMPTABLE <- .MAX .START -3>> ;"takes into consideration that
-																the first word is length, so
-																max - start +1 copied."
+	<COPY-TABLE-B ,OTHERTABLE ,TEMPTABLE .J > ;"takes into consideration that
+												the first word is length,so
+												actual text starts at position 3
+												in the table."																
 >
 
-<ROUTINE REVERSE ("OPT" OBJ PRTY "AUX" MAX C)
+<ROUTINE REVERSE ("OPT" OBJ PRTY "AUX" MAX C J)
 	<COND 	(<T? .OBJ>
 				<COND	(<F? .PRTY>
 							<SET .MAX <LEN .OBJ>>
@@ -198,7 +201,7 @@ An interactive fiction by Jack">
 				>
 			)
 			(T
-				<SET .MAX LEN>
+				<SET .MAX <LEN>>
 			)
 	>
 	<COND 	(<0? .MAX>
@@ -206,10 +209,14 @@ An interactive fiction by Jack">
 			)
 	>
 	<INC MAX>
+	<PUT ,OTHERTABLE 0 <GET ,TEMPTABLE 0>>
+	<SET .J 2>
 	<DO (I .MAX 2 -1)
 		<SET .C <GETB ,TEMPTABLE .I>>
-		<PRINTC .C>
+		<PUTB ,OTHERTABLE .J .C>
+		<INC .J>
 	>
+	<COPY-TABLE-B ,OTHERTABLE ,TEMPTABLE .J>
 >
 
 <ROUTINE SHOWSTRING ("OPT" TBL "AUX" MAX C)
@@ -218,7 +225,7 @@ An interactive fiction by Jack">
 			)
 	>
 	<SET .MAX <GET .TBL 0>>
-	<COND 	(<0? .MAX>
+	<COND 	(<0? .MAX> ;"empty table returns nothing"
 				<RETURN>
 			)
 	>
