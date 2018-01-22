@@ -54,9 +54,14 @@ An interactive fiction by Jack">
 <SYNTAX MID OBJECT = V-MID>
 <SYNTAX MIDPRES OBJECT = V-PRESMID>
 	
+<SYNTAX MIDBUF = V-MIDBUF>
+	
 <SYNTAX REV = V-REV>	
 <SYNTAX REV OBJECT = V-REV>
 <SYNTAX REVPRES OBJECT = V-PRESREV>	
+	
+<SYNTAX REVMID = V-REVMID>
+<SYNTAX REVMID OBJECT = V-REVMID>
 	
 <SYNTAX SHOW = V-SHOW>
 <SYNTAX SHOWOTHER = V-SHOWOTHER>
@@ -71,7 +76,7 @@ An interactive fiction by Jack">
 >
 
 <ROUTINE V-MIDBUF () ;"demo midstring on the buffer itself"
-	<DO (I 7 2 -1)
+	<DO (I 7 1 -1)
 		<TELL "Outer 2 and inner " N .I ": " >
 		<MID 2 .I>
 		<SHOWSTRING>
@@ -82,6 +87,17 @@ An interactive fiction by Jack">
 <ROUTINE V-MID () ;"demo midstring function on an object's name"
 	<DO (O 0 7)
 		<DO (I 0 7)
+			<TELL "Outer " N .O " and inner " N .I ": " >
+			<MID .O .I ,PRSO>
+			<SHOWSTRING>
+			<CRLF>
+		>
+	>
+>
+
+<ROUTINE V-REVMID () ;"demo midstring function on an object's name, but with negative len argument"
+	<DO (O 0 7)
+		<DO (I -7 0 1)
 			<TELL "Outer " N .O " and inner " N .I ": " >
 			<MID .O .I ,PRSO>
 			<SHOWSTRING>
@@ -124,6 +140,17 @@ An interactive fiction by Jack">
 	<CRLF>
 >
 
+;"==========================================
+Functions perform pseudostring manipulation
+============================================"
+
+;"LEN [object] [property]
+Purpose: Finds length of a string.
+Returns: a FIX, the length in characters of its argument.
+Comment: Used by a lot of other functions to get text into
+the buffer for further manipulation.
+"
+
 <ROUTINE LEN ("OPT" OBJ PRPTY "AUX" MAX ) ;"if object supplied, operates on whatever remains in temptable buffer"
 	<COND 	(<T? .OBJ>
 				<DIROUT 3 ,TEMPTABLE> ;"As side effect, reads argument into the temptable buffer
@@ -143,8 +170,16 @@ An interactive fiction by Jack">
 	<RETURN .MAX>
 >
 
+"MID start substring-length [object] [property]
+Purpose: Extract a substring.
+Returns: NULL.
+Comment: The result is left in the TEMPTABLE.
+A start less than 1 will be set equal to one.
+A negative substring-length will work from the right side of the word.
+The functions LEFT and RIGHT are special cases of MID.
+"
 ; "Print the string starting at element START for NUM characters (or up to end, if shorter)"
-<ROUTINE MID (START NUM "OPT" OBJ PRPTY "AUX" MAX J C)
+<ROUTINE MID (START NUM "OPT" OBJ PRPTY "AUX" MAX J C BKWRDS)
 	<COND 	(<=? .NUM 0> ; "zero length yields nothing, blow this clam bake."
 				<PUT ,TEMPTABLE 0 0>
 				<RFALSE>
@@ -166,6 +201,12 @@ An interactive fiction by Jack">
 				<SET .START 1>
 			)
 	>
+	<COND  	(<L? .NUM 0>
+				<SET .NUM <* .NUM -1>>
+				<SET .BKWRDS T>
+				<REVERSE>
+			)
+	>
 	<COND 	(<=? .MAX 0>
 				<SET .MAX <GET ,TEMPTABLE 0>>
 				<RFALSE> ;"as would be the case if, for example, a property were supplied, but the
@@ -176,7 +217,8 @@ An interactive fiction by Jack">
 			)
 	>
 	<INC .MAX>
-	<INC .START> ;"Put the final result back into TEMPTABLE so it can be further manipulated."
+	<INC .START> 
+	;"Put the final result back into TEMPTABLE so it can be further manipulated."
 	<PUT ,OTHERTABLE 0 <- .MAX .START -1>>
 	<SET .J 2>
 	<DO (I .START .MAX)
@@ -187,8 +229,18 @@ An interactive fiction by Jack">
 	<COPY-TABLE-B ,OTHERTABLE ,TEMPTABLE .J > ;"takes into consideration that
 												the first word is length,so
 												actual text starts at position 3
-												in the table."																
+												in the table."	
+	<COND 	(<T? .BKWRDS>
+				<REVERSE>
+			)
+	>
 >
+
+"REVERSE [object] [property]
+Purpose: Reverse the order of a string
+Returns: NULL.
+Comment: The result is left in the TEMPTABLE.
+"
 
 <ROUTINE REVERSE ("OPT" OBJ PRTY "AUX" MAX C J)
 	<COND 	(<T? .OBJ>
@@ -234,4 +286,24 @@ An interactive fiction by Jack">
 		<SET .C <GETB .TBL .I>>
 		<PRINTC .C>
 	>
+>
+
+"LEFT substring-length [object] [property]
+Purpose: Extract the left-most substring-length characters in a string
+Returns: NULL.
+Comment: The result is left in the TEMPTABLE.
+"
+
+<ROUTINE LEFT (NUM "OPT" OBJ PRPTY)
+	<MID 1 .NUM .OBJ .PRPTY>
+>
+
+"RIGHT substring-length [object] [property]
+Purpose: Extract the right-most substring-length characters in a string
+Returns: NULL.
+Comment: The result is left in the TEMPTABLE.
+"
+
+<ROUTINE RIGHT (NUM "OPT" OBJ PRPTY)
+	<MID 1 <* .NUM -1> .OBJ .PRPTY>
 >
