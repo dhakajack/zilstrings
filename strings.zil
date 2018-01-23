@@ -35,7 +35,7 @@ An interactive fiction by Jack">
 	(ADJECTIVE METAL TIMEY-WIMEY)
 	(IN LAB)
 	(LDESC "A shiny timey-wimey hyperdimensional object.")
-	(PRESIDENT "Cleveland")
+	(PRESIDENT "James K. Polk, Napoleon of the Stump.")
 >
 
 <OBJECT TMARBLE
@@ -68,6 +68,10 @@ An interactive fiction by Jack">
 <SYNTAX RIGHT = V-RIGHT>
 <SYNTAX RIGHT OBJECT = V-RIGHT>
 <SYNTAX RIGHTPRES OBJECT = V-PRESRIGHT>
+	
+<SYNTAX ROTATE = V-ROTATE>
+<SYNTAX ROTATE OBJECT = V-ROTATE>
+<SYNTAX ROTATEPRES OBJECT = V-PRESROTATE>
 	
 <ROUTINE GETNUM ()
 	<REPEAT ()
@@ -168,7 +172,21 @@ An interactive fiction by Jack">
 	<CRLF>
 >
 
+<ROUTINE V-ROTATE ("AUX" NUM)
+	<TELL "Rotate how many charcters, positive or negative?">
+	<SET .NUM <GETNUM>>
+	<ROTATE .NUM ,PRSO>
+	<SHOWSTRING>
+	<CRLF>
+>
 
+<ROUTINE V-PRESROTATE ("AUX" NUM)
+	<TELL "Rotate how many charcters, positive or negative?">
+	<SET .NUM <GETNUM>>
+	<ROTATE .NUM ,PRSO ,P?PRESIDENT>
+	<SHOWSTRING>
+	<CRLF>
+>
 
 ;"==========================================
 Functions perform pseudostring manipulation
@@ -338,3 +356,56 @@ Comment: The result is left in the TEMPTABLE.
 	<MID 1 <* .NUM -1> .OBJ .PRPTY>
 >
 
+"ROTATE how-many-units [object] [property]
+Purpose: Permute text by a constant number of characters right or, if negative, left
+Returns: NULL.
+Comment: The result is left in TEMPTABLE.
+"
+<ROUTINE ROTATE (ROT "OPT" OBJ PRTY "AUX" MAX C J)
+	<COND 	(<T? .OBJ>
+				<COND	(<F? .PRTY>
+							<SET .MAX <LEN .OBJ>>
+						)	
+						(T
+							<SET .MAX <LEN .OBJ .PRTY>>
+						) 
+				>
+			)
+			(T
+				<SET .MAX <LEN>>
+			)
+	>
+	<COND 	(<0? .MAX>
+				<RFALSE>
+			)
+	>
+	<SET .ROT <MOD .ROT 26>>
+	<COND 	(<L? .ROT 0>
+				<SET .ROT <+ .ROT 26>>
+			)
+	>
+	<INC MAX>
+	<PUT ,OTHERTABLE 0 <GET ,TEMPTABLE 0>>
+	<SET .J 2>
+	<DO (I 2 .MAX)
+		<SET .C <GETB ,TEMPTABLE .I>>
+		<COND 	(<AND <G=? .C !\a> <L=? .C !\z>>
+					<SET .C <+ .C .ROT>>
+					<COND 	(<G? .C !\z>
+								<SET .C <- .C 26>>
+							)
+					>
+				)
+				(<AND <G=? .C !\A> <L=? .C !\Z>>
+						<SET .C <+ .C .ROT>>
+						<COND 	(<G? .C !\Z>
+								<SET .C <- .C 26>>
+							)
+					>
+				)
+		>
+		<PUTB ,OTHERTABLE .J .C>
+		<INC .J>
+	>
+	<COPY-TABLE-B ,OTHERTABLE ,TEMPTABLE .J>
+>
