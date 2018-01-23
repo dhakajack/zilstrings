@@ -73,6 +73,10 @@ An interactive fiction by Jack">
 <SYNTAX ROTATE OBJECT = V-ROTATE>
 <SYNTAX ROTATEPRES OBJECT = V-PRESROTATE>
 	
+<SYNTAX TOUPPER = V-TOUPPER>
+<SYNTAX TOUPPER OBJECT = V-TOUPPER>
+<SYNTAX TOUPPERPRES OBJECT = V-PRESTOUPPER>
+	
 <ROUTINE GETNUM ()
 	<REPEAT ()
 		<TELL "#>">
@@ -86,6 +90,18 @@ An interactive fiction by Jack">
 		>
 	>
 	<RETURN ,P-NUMBER>
+>
+
+<ROUTINE V-TOUPPER ()
+	<TOUPPER ,PRSO>
+	<SHOWSTRING>
+	<CRLF>
+>
+
+<ROUTINE V-PRESTOUPPER ()
+	<TOUPPER ,PRSO ,P?PRESIDENT>
+	<SHOWSTRING>
+	<CRLF>
 >
 	
 
@@ -402,6 +418,45 @@ Comment: The result is left in TEMPTABLE.
 								<SET .C <- .C 26>>
 							)
 					>
+				)
+		>
+		<PUTB ,OTHERTABLE .J .C>
+		<INC .J>
+	>
+	<COPY-TABLE-B ,OTHERTABLE ,TEMPTABLE .J>
+>
+
+
+"TOUPPER [object] [property]
+Purpose: PUT TEXT IN ALL CAPS
+Returns: NULL.
+Comment: The result is left in TEMPTABLE.
+"
+<ROUTINE TOUPPER ("OPT" OBJ PRTY "AUX" MAX C J)
+	<COND 	(<T? .OBJ>
+				<COND	(<F? .PRTY>
+							<SET .MAX <LEN .OBJ>>
+						)	
+						(T
+							<SET .MAX <LEN .OBJ .PRTY>>
+						) 
+				>
+			)
+			(T
+				<SET .MAX <LEN>>
+			)
+	>
+	<COND 	(<0? .MAX>
+				<RFALSE>
+			)
+	>
+	<INC MAX>
+	<PUT ,OTHERTABLE 0 <GET ,TEMPTABLE 0>>
+	<SET .J 2>
+	<DO (I 2 .MAX)
+		<SET .C <GETB ,TEMPTABLE .I>>
+		<COND 	(<AND <G=? .C !\a> <L=? .C !\z>>
+					<SET .C <- .C <- !\a  !\A>>>
 				)
 		>
 		<PUTB ,OTHERTABLE .J .C>
