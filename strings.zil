@@ -77,6 +77,10 @@ An interactive fiction by Jack">
 <SYNTAX TOUPPER OBJECT = V-TOUPPER>
 <SYNTAX TOUPPERPRES OBJECT = V-PRESTOUPPER>
 	
+<SYNTAX TOLOWER = V-TOLOWER>
+<SYNTAX TOLOWER OBJECT = V-TOLOWER>
+<SYNTAX TOLOWERPRES OBJECT = V-PRESTOLOWER>
+	
 <ROUTINE GETNUM ()
 	<REPEAT ()
 		<TELL "#>">
@@ -104,6 +108,17 @@ An interactive fiction by Jack">
 	<CRLF>
 >
 	
+<ROUTINE V-TOLOWER ()
+	<TOLOWER ,PRSO>
+	<SHOWSTRING>
+	<CRLF>
+>
+
+<ROUTINE V-PRESTOLOWER ()
+	<TOLOWER ,PRSO ,P?PRESIDENT>
+	<SHOWSTRING>
+	<CRLF>
+>
 
 <ROUTINE V-LONG ()
 	<TELL "The description length is " N <LEN ,PRSO> CR>	
@@ -457,6 +472,44 @@ Comment: The result is left in TEMPTABLE.
 		<SET .C <GETB ,TEMPTABLE .I>>
 		<COND 	(<AND <G=? .C !\a> <L=? .C !\z>>
 					<SET .C <- .C <- !\a  !\A>>>
+				)
+		>
+		<PUTB ,OTHERTABLE .J .C>
+		<INC .J>
+	>
+	<COPY-TABLE-B ,OTHERTABLE ,TEMPTABLE .J>
+>
+
+"TOLOWER [object] [property]
+Purpose: PUT TEXT IN ALL CAPS
+Returns: NULL.
+Comment: The result is left in TEMPTABLE.
+"
+<ROUTINE TOLOWER ("OPT" OBJ PRTY "AUX" MAX C J)
+	<COND 	(<T? .OBJ>
+				<COND	(<F? .PRTY>
+							<SET .MAX <LEN .OBJ>>
+						)	
+						(T
+							<SET .MAX <LEN .OBJ .PRTY>>
+						) 
+				>
+			)
+			(T
+				<SET .MAX <LEN>>
+			)
+	>
+	<COND 	(<0? .MAX>
+				<RFALSE>
+			)
+	>
+	<INC MAX>
+	<PUT ,OTHERTABLE 0 <GET ,TEMPTABLE 0>>
+	<SET .J 2>
+	<DO (I 2 .MAX)
+		<SET .C <GETB ,TEMPTABLE .I>>
+		<COND 	(<AND <G=? .C !\A> <L=? .C !\Z>>
+					<SET .C <+ .C <- !\a  !\A>>>
 				)
 		>
 		<PUTB ,OTHERTABLE .J .C>
