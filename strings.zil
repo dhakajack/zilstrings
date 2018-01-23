@@ -58,9 +58,6 @@ An interactive fiction by Jack">
 <SYNTAX REV OBJECT = V-REV>
 <SYNTAX REVPRES OBJECT = V-PRESREV>	
 	
-<SYNTAX REVMID = V-REVMID>
-<SYNTAX REVMID OBJECT = V-REVMID>
-	
 <SYNTAX SHOW = V-SHOW>
 <SYNTAX SHOWOTHER = V-SHOWOTHER>
 	
@@ -89,28 +86,26 @@ An interactive fiction by Jack">
 	<TELL "The length of the presidential name, if any, associated with " D ,PRSO " is: " N <LEN ,PRSO ,P?PRESIDENT> CR> 
 >
 
-
 <ROUTINE V-MID ("AUX" BEGIN SSLEN) ;"demo midstring function on an object's name"
+	<LEN ,PRSO> ;"just to load it in; could also test if LEN > 0 to proceed"
+	<MIDCOMMON>
+>
+
+<ROUTINE V-PRESMID ()
+	<LEN ,PRSO ,P?PRESIDENT>
+	<MIDCOMMON>
+>
+
+<ROUTINE MIDCOMMON ("AUX" BEGIN SSLEN)
 	<TELL "Starting at what position?" CR>
 	<SET .BEGIN <GETNUM>>
-	<TELL "What is the substring length?" CR>
+	<TELL "What is the substring length (negative for other end)?" CR>
 	<SET .SSLEN <GETNUM>>
-	<MID .BEGIN .SSLEN ,PRSO>
-	<TELL "The resultant substring is \"">
+	<MID .BEGIN .SSLEN>
 	<SHOWSTRING>
-	<TELL "\"." CR>
+	<CRLF>
 >
 
-<ROUTINE V-REVMID () ;"demo midstring function on an object's name, but with negative len argument"
-	<DO (O 0 7)
-		<DO (I -7 0 1)
-			<TELL "Outer " N .O " and inner " N .I ": " >
-			<MID .O .I ,PRSO>
-			<SHOWSTRING>
-			<CRLF>
-		>
-	>
->
 
 <ROUTINE V-SHOW () ;"show what's in the scratch buffer"
 	<SHOWSTRING>
@@ -122,16 +117,7 @@ An interactive fiction by Jack">
 	<CRLF>
 >
 
-<ROUTINE V-PRESMID ()
-	<DO (O 0 7)
-		<DO (I 0 7)
-			<TELL "Outer " N .O " and inner " N .I ": " >
-			<MID .O .I ,PRSO ,P?PRESIDENT>
-			<SHOWSTRING>
-			<CRLF>
-		>
-	>
->
+
 
 <ROUTINE V-REV ()
 	<REVERSE ,PRSO>
