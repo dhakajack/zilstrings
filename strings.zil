@@ -50,11 +50,9 @@ An interactive fiction by Jack">
 <SYNTAX LEN OBJECT = V-LONG>
 <SYNTAX LENPRES OBJECT = V-PRESLONG>
 
-<SYNTAX MID = V-MIDBUF>	
+<SYNTAX MID = V-MID>
 <SYNTAX MID OBJECT = V-MID>
 <SYNTAX MIDPRES OBJECT = V-PRESMID>
-	
-<SYNTAX MIDBUF = V-MIDBUF>
 	
 <SYNTAX REV = V-REV>	
 <SYNTAX REV OBJECT = V-REV>
@@ -66,9 +64,7 @@ An interactive fiction by Jack">
 <SYNTAX SHOW = V-SHOW>
 <SYNTAX SHOWOTHER = V-SHOWOTHER>
 	
-<SYNTAX GETNUM = V-GETNUM>
-	
-<ROUTINE V-GETNUM ()
+<ROUTINE GETNUM ()
 	<REPEAT ()
 		<TELL "#>">
 		<READLINE>
@@ -93,24 +89,16 @@ An interactive fiction by Jack">
 	<TELL "The length of the presidential name, if any, associated with " D ,PRSO " is: " N <LEN ,PRSO ,P?PRESIDENT> CR> 
 >
 
-<ROUTINE V-MIDBUF () ;"demo midstring on the buffer itself"
-	<DO (I 7 1 -1)
-		<TELL "Outer 2 and inner " N .I ": " >
-		<MID 2 .I>
-		<SHOWSTRING>
-		<CRLF>
-	>
->
 
-<ROUTINE V-MID () ;"demo midstring function on an object's name"
-	<DO (O 0 7)
-		<DO (I 0 7)
-			<TELL "Outer " N .O " and inner " N .I ": " >
-			<MID .O .I ,PRSO>
-			<SHOWSTRING>
-			<CRLF>
-		>
-	>
+<ROUTINE V-MID ("AUX" BEGIN SSLEN) ;"demo midstring function on an object's name"
+	<TELL "Starting at what position?" CR>
+	<SET .BEGIN <GETNUM>>
+	<TELL "What is the substring length?" CR>
+	<SET .SSLEN <GETNUM>>
+	<MID .BEGIN .SSLEN ,PRSO>
+	<TELL "The resultant substring is \"">
+	<SHOWSTRING>
+	<TELL "\"." CR>
 >
 
 <ROUTINE V-REVMID () ;"demo midstring function on an object's name, but with negative len argument"
