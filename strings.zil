@@ -61,6 +61,14 @@ An interactive fiction by Jack">
 <SYNTAX SHOW = V-SHOW>
 <SYNTAX SHOWOTHER = V-SHOWOTHER>
 	
+<SYNTAX LEFT = V-LEFT>
+<SYNTAX LEFT OBJECT = V-LEFT>
+<SYNTAX LEFTPRES OBJECT = V-PRESLEFT>
+	
+<SYNTAX RIGHT = V-RIGHT>
+<SYNTAX RIGHT OBJECT = V-RIGHT>
+<SYNTAX RIGHTPRES OBJECT = V-PRESRIGHT>
+	
 <ROUTINE GETNUM ()
 	<REPEAT ()
 		<TELL "#>">
@@ -73,7 +81,6 @@ An interactive fiction by Jack">
 				)
 		>
 	>
-	<TELL "Number is " N ,P-NUMBER CR>
 	<RETURN ,P-NUMBER>
 >
 	
@@ -106,6 +113,37 @@ An interactive fiction by Jack">
 	<CRLF>
 >
 
+<ROUTINE V-LEFT ("OPT" OBJ PRPTY "AUX" NUM)
+	<TELL "How many characters?" CR>
+	<SET .NUM <GETNUM>>
+	<LEFT .NUM ,PRSO>
+	<SHOWSTRING>
+	<CRLF>
+>
+
+<ROUTINE V-PRESLEFT ("OPT" OBJ PRPTY "AUX" NUM)
+	<TELL "How many characters?" CR>
+	<SET .NUM <GETNUM>>
+	<LEFT .NUM ,PRSO ,P?PRESIDENT>
+	<SHOWSTRING>
+	<CRLF>
+>
+
+<ROUTINE V-RIGHT ("OPT" OBJ PRPTY "AUX" NUM)
+	<TELL "How many characters?" CR>
+	<SET .NUM <GETNUM>>
+	<RIGHT .NUM ,PRSO>
+	<SHOWSTRING>
+	<CRLF>
+>
+
+<ROUTINE V-PRESRIGHT ("OPT" OBJ PRPTY "AUX" NUM)
+	<TELL "How many characters?" CR>
+	<SET .NUM <GETNUM>>
+	<RIGHT .NUM ,PRSO ,P?PRESIDENT>
+	<SHOWSTRING>
+	<CRLF>
+>
 
 <ROUTINE V-SHOW () ;"show what's in the scratch buffer"
 	<SHOWSTRING>
@@ -116,8 +154,6 @@ An interactive fiction by Jack">
 	<SHOWSTRING ,OTHERTABLE>
 	<CRLF>
 >
-
-
 
 <ROUTINE V-REV ()
 	<REVERSE ,PRSO>
@@ -131,6 +167,8 @@ An interactive fiction by Jack">
 	<SHOWSTRING>
 	<CRLF>
 >
+
+
 
 ;"==========================================
 Functions perform pseudostring manipulation
@@ -299,3 +337,4 @@ Comment: The result is left in the TEMPTABLE.
 <ROUTINE RIGHT (NUM "OPT" OBJ PRPTY)
 	<MID 1 <* .NUM -1> .OBJ .PRPTY>
 >
+
