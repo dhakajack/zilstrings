@@ -66,6 +66,24 @@ An interactive fiction by Jack">
 <SYNTAX SHOW = V-SHOW>
 <SYNTAX SHOWOTHER = V-SHOWOTHER>
 	
+<SYNTAX GETNUM = V-GETNUM>
+	
+<ROUTINE V-GETNUM ()
+	<REPEAT ()
+		<TELL "#>">
+		<READLINE>
+		<COND 	(<PARSE-NUMBER? 1>
+					<RETURN>
+				)
+				(T
+					<TELL "Please enter an integer." CR >
+				)
+		>
+	>
+	<TELL "Number is " N ,P-NUMBER CR>
+	<RETURN ,P-NUMBER>
+>
+	
 
 <ROUTINE V-LONG ()
 	<TELL "The description length is " N <LEN ,PRSO> CR>	
