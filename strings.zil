@@ -10,6 +10,7 @@
 An interactive fiction by Jack">
 
 <CONSTANT OTHERTABLE <ITABLE 50>> ;"Holds intermediate results before copying back to TEMPTABLE"
+<CONSTANT MAXTBLSIZE 50>
 
 <ROUTINE GO ()
     <CRLF> <CRLF>
@@ -81,6 +82,8 @@ An interactive fiction by Jack">
 <SYNTAX TOLOWER OBJECT = V-TOLOWER>
 <SYNTAX TOLOWERPRES OBJECT = V-PRESTOLOWER>
 	
+<SYNTAX PREPEND = V-PREPEND>
+	
 <ROUTINE GETNUM ()
 	<REPEAT ()
 		<TELL "#>">
@@ -94,6 +97,17 @@ An interactive fiction by Jack">
 		>
 	>
 	<RETURN ,P-NUMBER>
+>
+
+<ROUTINE V-PREPEND ()
+	<TELL "Starting contents of TEMPTABLE: ">
+	<SHOWSTRING>
+	<TELL "||Starting content of OTHERTABLE: " >
+	<SHOWSTRING ,OTHERTABLE>
+	<TELL "||And now combined..." CR>
+	<PREPEND ,OTHERTABLE>
+	<SHOWSTRING>
+	<CRLF>	
 >
 
 <ROUTINE V-TOUPPER ()
@@ -516,4 +530,38 @@ Comment: The result is left in TEMPTABLE.
 		<INC .J>
 	>
 	<COPY-TABLE-B ,OTHERTABLE ,TEMPTABLE .J>
+>
+
+<ROUTINE PREPEND (SRCTBL "AUX" LENSRC C POS)
+	<SET .LENSRC <GET .SRCTBL 0>>
+	<TELL "Length to be inserted: " N .LENSRC CR>
+	<COND 	(<0? .LENSRC>
+				<TELL "DEBUG: RETURNING: NOTHING">
+				<RETURN>
+			)
+			(<G=? .LENSRC MAXTBLSIZE>
+				<COPY-TABLE-B ,OTHERTABLE ,TEMPTABLE MAXTBLSIZE>
+				<TELL "Othertable is maxed out; replacing temptable." CR>
+				<RETURN>
+			)
+	>
+	<SET .POS <+ .LENSRC <GET ,TEMPTABLE 0> 1>>
+	<TELL "POS determined to be: " N .POS CR>
+	<COND 	(<G? .POS <+ 1 MAXTBLSIZE>>
+				<SET .POS <+ 1 MAXTBLSIZE>>
+			)
+	>
+	<TELL "POS after check for max len: " N .POS CR>
+	<DO (I .POS <=? .I <- .POS <GET ,TEMPTABLE 0>>> -1)
+		<SET .C <GETB ,TEMPTABLE <- .I .LENSRC>>>
+		<TELL "Shifting up: " C .C CR>
+		<PUTB ,TEMPTABLE .I .C>
+	>
+	<PUT ,TEMPTABLE 0 <- .POS 1>>
+	<DO (I 2 <G? .I <+ .LENSRC 1>>)
+		<SET .C <GETB .SRCTBL .I>>
+		<TELL "inserting charcter:" C .C CR>
+		<PUTB ,TEMPTABLE .I .C>
+	>
+	<TELL "DONE." CR>
 >
