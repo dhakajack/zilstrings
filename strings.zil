@@ -47,6 +47,8 @@ An interactive fiction by Jack">
 	(LDESC "A sphere of coloured glass.")
 >
 
+"Verbs"
+
 <SYNTAX LEN = V-LONG> 
 <SYNTAX LEN OBJECT = V-LONG>
 <SYNTAX LENPRES OBJECT = V-PRESLONG>
@@ -83,29 +85,26 @@ An interactive fiction by Jack">
 <SYNTAX TOLOWERPRES OBJECT = V-PRESTOLOWER>
 	
 <SYNTAX PREPEND = V-PREPEND>
-	
-<ROUTINE GETNUM ()
-	<REPEAT ()
-		<TELL "#>">
-		<READLINE>
-		<COND 	(<PARSE-NUMBER? 1>
-					<RETURN>
-				)
-				(T
-					<TELL "Please enter an integer." CR >
-				)
-		>
-	>
-	<RETURN ,P-NUMBER>
->
+<SYNTAX APPEND = V-APPEND>
 
 <ROUTINE V-PREPEND ()
 	<TELL "Starting contents of TEMPTABLE: ">
 	<SHOWSTRING>
-	<TELL "||Starting content of OTHERTABLE: " >
+	<TELL "|Starting content of OTHERTABLE: " >
 	<SHOWSTRING ,OTHERTABLE>
-	<TELL "||And now combined..." CR>
+	<TELL "|And now combined..." CR>
 	<PREPEND ,OTHERTABLE>
+	<SHOWSTRING>
+	<CRLF>	
+>
+
+<ROUTINE V-APPEND ()
+	<TELL "Starting contents of TEMPTABLE: ">
+	<SHOWSTRING>
+	<TELL "|Starting content of OTHERTABLE: " >
+	<SHOWSTRING ,OTHERTABLE>
+	<TELL "|And now combined..." CR>
+	<APPEND ,OTHERTABLE>
 	<SHOWSTRING>
 	<CRLF>	
 >
@@ -231,6 +230,21 @@ An interactive fiction by Jack">
 	<ROTATE .NUM ,PRSO ,P?PRESIDENT>
 	<SHOWSTRING>
 	<CRLF>
+>
+
+<ROUTINE GETNUM ()
+	<REPEAT ()
+		<TELL "#>">
+		<READLINE>
+		<COND 	(<PARSE-NUMBER? 1>
+					<RETURN>
+				)
+				(T
+					<TELL "Please enter an integer." CR >
+				)
+		>
+	>
+	<RETURN ,P-NUMBER>
 >
 
 ;"==========================================
@@ -534,34 +548,50 @@ Comment: The result is left in TEMPTABLE.
 
 <ROUTINE PREPEND (SRCTBL "AUX" LENSRC C POS)
 	<SET .LENSRC <GET .SRCTBL 0>>
-	<TELL "Length to be inserted: " N .LENSRC CR>
 	<COND 	(<0? .LENSRC>
-				<TELL "DEBUG: RETURNING: NOTHING">
 				<RETURN>
 			)
 			(<G=? .LENSRC MAXTBLSIZE>
 				<COPY-TABLE-B ,OTHERTABLE ,TEMPTABLE MAXTBLSIZE>
-				<TELL "Othertable is maxed out; replacing temptable." CR>
 				<RETURN>
 			)
 	>
 	<SET .POS <+ .LENSRC <GET ,TEMPTABLE 0> 1>>
-	<TELL "POS determined to be: " N .POS CR>
 	<COND 	(<G? .POS <+ 1 MAXTBLSIZE>>
 				<SET .POS <+ 1 MAXTBLSIZE>>
 			)
 	>
-	<TELL "POS after check for max len: " N .POS CR>
 	<DO (I .POS <=? .I <- .POS <GET ,TEMPTABLE 0>>> -1)
 		<SET .C <GETB ,TEMPTABLE <- .I .LENSRC>>>
-		<TELL "Shifting up: " C .C CR>
 		<PUTB ,TEMPTABLE .I .C>
 	>
 	<PUT ,TEMPTABLE 0 <- .POS 1>>
 	<DO (I 2 <G? .I <+ .LENSRC 1>>)
 		<SET .C <GETB .SRCTBL .I>>
-		<TELL "inserting charcter:" C .C CR>
 		<PUTB ,TEMPTABLE .I .C>
 	>
+>
+
+<ROUTINE APPEND (SRCTBL "AUX" LENSRC C POS)
+	<SET .LENSRC <GET .SRCTBL 0>>
+	<TELL "Length to be appended: " N .LENSRC CR>
+	<COND 	(<0? .LENSRC>
+				<TELL "DEBUG: RETURNING: Nothing to add." CR>
+				<RETURN>
+			)
+			(<G=? <GET ,TEMPTABLE 0> MAXTBLSIZE>
+				<TELL "DEBUG: No room to add anything, temptable already maxed" CR>
+				<RETURN>
+			)
+	>
+	<SET .POS <+ <GET ,TEMPTABLE 0> 2>>
+	<TELL "Starting at position: " N .POS CR>
+	<DO (I 1 <OR <G? .I .LENSRC> <G? .POS <+ MAXTBLSIZE 1>>>)
+		<SET .C <GETB ,OTHERTABLE <+ .I 1>>>
+		<TELL "Adding: " C .C CR>
+		<PUTB ,TEMPTABLE .POS .C>
+		<INC .POS>
+	>
+	<PUT ,TEMPTABLE 0 <- .POS 2>>
 	<TELL "DONE." CR>
 >
