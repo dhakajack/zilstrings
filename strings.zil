@@ -546,6 +546,10 @@ Comment: The result is left in TEMPTABLE.
 	<COPY-TABLE-B ,OTHERTABLE ,TEMPTABLE .J>
 >
 
+"PREPEND sourcetable
+Purpose: insert contents of source table before existing contents of TEMPTABLE
+Returns: NULL.
+"
 <ROUTINE PREPEND (SRCTBL "AUX" LENSRC C POS)
 	<SET .LENSRC <GET .SRCTBL 0>>
 	<COND 	(<0? .LENSRC>
@@ -572,6 +576,10 @@ Comment: The result is left in TEMPTABLE.
 	>
 >
 
+"APPEND sourcetable
+Purpose: insert contents of source table after existing contents of TEMPTABLE
+Returns: NULL.
+"
 <ROUTINE APPEND (SRCTBL "AUX" LENSRC C POS)
 	<SET .LENSRC <GET .SRCTBL 0>>
 	<TELL "Length to be appended: " N .LENSRC CR>
