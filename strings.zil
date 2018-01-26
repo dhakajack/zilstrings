@@ -582,24 +582,18 @@ Returns: NULL.
 "
 <ROUTINE APPEND (SRCTBL "AUX" LENSRC C POS)
 	<SET .LENSRC <GET .SRCTBL 0>>
-	<TELL "Length to be appended: " N .LENSRC CR>
 	<COND 	(<0? .LENSRC>
-				<TELL "DEBUG: RETURNING: Nothing to add." CR>
 				<RETURN>
 			)
 			(<G=? <GET ,TEMPTABLE 0> MAXTBLSIZE>
-				<TELL "DEBUG: No room to add anything, temptable already maxed" CR>
 				<RETURN>
 			)
 	>
 	<SET .POS <+ <GET ,TEMPTABLE 0> 2>>
-	<TELL "Starting at position: " N .POS CR>
 	<DO (I 1 <OR <G? .I .LENSRC> <G? .POS <+ MAXTBLSIZE 1>>>)
 		<SET .C <GETB ,OTHERTABLE <+ .I 1>>>
-		<TELL "Adding: " C .C CR>
 		<PUTB ,TEMPTABLE .POS .C>
 		<INC .POS>
 	>
 	<PUT ,TEMPTABLE 0 <- .POS 2>>
-	<TELL "DONE." CR>
 >
