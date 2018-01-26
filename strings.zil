@@ -1,4 +1,4 @@
-"EMPTY GAME main file"
+"STRINGDEMO main file"
 
 <VERSION XZIP>
 <CONSTANT RELEASEID 1>
